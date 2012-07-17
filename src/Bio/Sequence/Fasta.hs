@@ -12,9 +12,9 @@
 -}
 
 module Bio.Sequence.Fasta
-    (
+    ( Sequence(..)
     -- * Reading and writing plain FASTA files
-    readFasta, writeFasta, hReadFasta, hWriteFasta
+    , readFasta, writeFasta, hReadFasta, hWriteFasta
     -- * Counting sequences in a FASTA file
     , countSeqs
     -- * Helper function for reading your own sequences
