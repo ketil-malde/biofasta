@@ -7,7 +7,7 @@
    and a set of lines containing the sequence data.
 
    As Fasta is used for both amino acids and nucleotides, the
-   resulting 'Sequence's are type-tagged with 'Unknown'.  If you know the 
+   resulting 'Sequence's are type-tagged with 'Unknown'.  If you know the
    type of sequence you are reading, use 'castToAmino' or 'castToNuc'.
 -}
 
@@ -19,6 +19,8 @@ module Bio.Sequence.Fasta
     , countSeqs
     -- * Helper function for reading your own sequences
     , mkSeqs
+    -- * Convert SeqData to String
+    , toStr
 ) where
 
 
@@ -106,8 +108,8 @@ mkSeqs :: [ByteString] -> [Sequence]
 mkSeqs = map mkSeq . blocks
 
 mkSeq :: [ByteString] -> Sequence
-mkSeq (l:ls) 
-  -- maybe check this?  | B.length l < 2 || isSpace (B.head $ B.tail l) 
+mkSeq (l:ls)
+  -- maybe check this?  | B.length l < 2 || isSpace (B.head $ B.tail l)
   --  = error "Trying to read sequence without a name...and failing."
   | otherwise = Seq (SeqLabel (B.drop 1 l)) (SeqData (B.filter (not . isSpace) $ B.concat $ takeWhile isSeq ls)) Nothing
     where isSeq s = (not . B.null) s && ((flip elem) (['A'..'Z']++['a'..'z']) . B.head) s
