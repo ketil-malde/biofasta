@@ -4,11 +4,7 @@
    This module incorporates functionality for reading and writing
    sequence data in the Fasta format.
    Each sequence consists of a header (with a '>' prefix)
-   and a set of lines containing the sequence data.
-
-   As Fasta is used for both amino acids and nucleotides, the
-   resulting 'Sequence's are type-tagged with 'Unknown'.  If you know the
-   type of sequence you are reading, use 'castToAmino' or 'castToNuc'.
+   and a set of lines containing the sequence data..
 -}
 
 module Bio.Sequence.Fasta
@@ -19,8 +15,8 @@ module Bio.Sequence.Fasta
     , countSeqs
     -- * Helper function for reading your own sequences
     , mkSeqs
-    -- * Convert SeqData to String
-    , toStr
+    -- * Other
+    , toStr, seqid, seqheader, seqdata, seqlength
 ) where
 
 
@@ -38,31 +34,19 @@ splitsAt :: Offset -> ByteString -> [ByteString]
 splitsAt n s = let (s1,s2) = B.splitAt (unOff n) s
                in if B.null s2 then [s1] else s1 : splitsAt n s2
 
-{-
--- ugly?
-class SeqType sd where
-    toSeq :: sd -> sd -> Sequence
-    fromSeq :: Sequence -> (sd,sd)
-
-instance SeqType B.ByteString where
-    toSeq = Seq
-    fromSeq (Seq x y) = (x,y)
-
-instance SeqType BS.ByteString where
-    toSeq h s = Seq (B.fromChunks [h]) (B.fromChunks [s])
-    fromSeq (Seq x y) = (c x, c y) where c = BS.concat . B.toChunks
--}
-
 data Sequence = Seq SeqLabel SeqData (Maybe QualData)
                 deriving Eq
 
 instance BioSeq Sequence where
-  seqlabel  (Seq lab seq mqual) = lab
+  seqid     (Seq lab seq mqual) = SeqLabel {unSL = head $ B.split ' ' $ unSL lab}
+  seqheader (Seq lab seq mqual) = lab
   seqdata   (Seq lab seq mqual) = seq
   seqlength (Seq lab seq mqual) = Offset {unOff = B.length $ unSD seq}
 
 instance Show Sequence where
-  show (Seq lab seq qual) = ">" ++ (B.unpack $ unSL lab) ++ "\n" ++  (B.unpack $ unSD seq)
+  show (Seq lab seq qual) = ">"
+                            ++ (B.unpack $ unSL lab)
+                            ++ "\n" ++  (B.unpack $ unSD seq)
 
 toStr :: SeqData -> String
 toStr  = B.unpack . unSD
@@ -111,14 +95,21 @@ mkSeq :: [ByteString] -> Sequence
 mkSeq (l:ls)
   -- maybe check this?  | B.length l < 2 || isSpace (B.head $ B.tail l)
   --  = error "Trying to read sequence without a name...and failing."
-  | otherwise = Seq (SeqLabel (B.drop 1 l)) (SeqData (B.filter (not . isSpace) $ B.concat $ takeWhile isSeq ls)) Nothing
-    where isSeq s = (not . B.null) s && ((flip elem) (['A'..'Z']++['a'..'z']) . B.head) s
+  | otherwise = Seq (SeqLabel (B.drop 1 l))
+                    (SeqData (B.filter (not . isSpace) $ B.concat $ takeWhile isSeq ls))
+                    Nothing
+                where isSeq s = (not . B.null) s &&
+                                ((flip elem)
+                                 (['A'..'Z']++['a'..'z']) . B.head) s
 mkSeq [] = error "empty input to mkSeq"
 
 -- | Split lines into blocks starting with '>' characters
 --   Filter out # comments (but not semicolons?)
 blocks :: [ByteString] -> [[ByteString]]
-blocks = groupBy (const (('>' /=) . B.head)) . filter ((/='#') . B.head) . dropWhile (('>' /=) . B.head) . filter (not . B.null)
+blocks = groupBy (const (('>' /=) . B.head))
+         . filter ((/='#') . B.head)
+         . dropWhile (('>' /=) . B.head)
+         . filter (not . B.null)
 
 countSeqs :: FilePath -> IO Int
 countSeqs f = do
