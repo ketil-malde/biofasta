@@ -6,7 +6,7 @@ Homepage:	     https://patch-tag.com/r/dfornika/biofasta/home
 License:             GPL
 License-file:        LICENSE
 Cabal-Version:       >=1.6
-Author:              Dan Fornika <dfornika@gmail.com>
+Author:              Ketil Malde <ketil@malde.org>
 Maintainer:          dfornika@gmail.com
 Stability:	     Provisional
 Category:	     Bioinformatics
