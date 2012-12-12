@@ -43,11 +43,6 @@ instance BioSeq Sequence where
   seqdata   (Seq lab seq mqual) = seq
   seqlength (Seq lab seq mqual) = Offset {unOff = B.length $ unSD seq}
 
-instance Show Sequence where
-  show (Seq lab seq qual) = ">"
-                            ++ (B.unpack $ unSL lab)
-                            ++ "\n" ++  (B.unpack $ unSD seq)
-
 toStr :: SeqData -> String
 toStr  = B.unpack . unSD
 
