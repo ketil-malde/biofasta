@@ -38,7 +38,7 @@ data Sequence = Seq SeqLabel SeqData (Maybe QualData)
                 deriving Eq
 
 instance BioSeq Sequence where
-  seqid     (Seq lab seq mqual) = SeqLabel {unSL = head $ B.split ' ' $ unSL lab}
+  seqid     (Seq lab seq mqual) = SeqLabel {unSL = B.takeWhile (/= ' ') $ unSL lab}
   seqheader (Seq lab seq mqual) = lab
   seqdata   (Seq lab seq mqual) = seq
   seqlength (Seq lab seq mqual) = Offset {unOff = B.length $ unSD seq}
