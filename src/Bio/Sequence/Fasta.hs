@@ -35,7 +35,7 @@ splitsAt n s = let (s1,s2) = B.splitAt (unOff n) s
                in if B.null s2 then [s1] else s1 : splitsAt n s2
 
 data Sequence = Seq SeqLabel SeqData (Maybe QualData)
-                deriving Eq
+                deriving Show, Eq
 
 instance BioSeq Sequence where
   seqid     (Seq lab seq mqual) = SeqLabel {unSL = B.takeWhile (/= ' ') $ unSL lab}
