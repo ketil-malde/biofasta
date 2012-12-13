@@ -87,16 +87,12 @@ mkSeqs :: [ByteString] -> [Sequence]
 mkSeqs = map mkSeq . blocks
 
 mkSeq :: [ByteString] -> Sequence
-mkSeq (l:ls)
-  -- maybe check this?  | B.length l < 2 || isSpace (B.head $ B.tail l)
-  --  = error "Trying to read sequence without a name...and failing."
-  | otherwise = Seq (SeqLabel (B.drop 1 l))
-                    (SeqData (B.filter (not . isSpace) $ B.concat $ takeWhile isSeq ls))
-                    Nothing
-                where isSeq s = (not . B.null) s &&
-                                ((flip elem)
-                                 (['A'..'Z']++['a'..'z']) . B.head) s
-mkSeq [] = error "empty input to mkSeq"
+mkSeq (l:ls) = Seq (SeqLabel (B.drop 1 l))
+               (SeqData (B.filter (not . isSpace) $ B.concat $ takeWhile isSeq ls))
+               Nothing
+               where isSeq s = (not . B.null) s &&
+                               (flip elem (['A'..'Z']++['a'..'z']) . B.head) s
+mkSeq []     = error "empty input to mkSeq"
 
 -- | Split lines into blocks starting with '>' characters
 --   Filter out # comments (but not semicolons?)
