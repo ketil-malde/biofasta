@@ -11,6 +11,7 @@ Maintainer:          dfornika@gmail.com
 Stability:	     Provisional
 Category:	     Bioinformatics
 Build-Type:          Simple
+Extra-Source-Files:  src/Test.hs
 
 Library
   Build-depends:     base >= 2 && < 5, biocore, bytestring
