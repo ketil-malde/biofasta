@@ -42,7 +42,7 @@ data Sequence = Seq SeqLabel SeqData (Maybe QualData)
                 deriving (Show, Eq)
 
 instance BioSeq Sequence where
-  seqid     (Seq lab _sq _mqual) = SeqLabel {unSL = B.takeWhile (/= ' ') $ unSL lab}
+  seqid     (Seq lab _sq _mqual) = SeqLabel {unSL = B.takeWhile (not . isSpace) $ unSL lab}
   seqheader (Seq lab _sq _mqual) = lab
   seqdata   (Seq _lab sq _mqual) = sq
   seqlength (Seq _lab sq _mqual) = Offset {unOff = B.length $ unSD sq}
